@@ -2,40 +2,54 @@
 
 List<User> usersList = new List<User>();
 
-Console.WriteLine("Please Select The Options");
-Console.WriteLine("1. Add User");
-Console.WriteLine("2. Edit User");
-Console.WriteLine("3. Delete User");
-Console.WriteLine("4. Display Specific User");
-int selectedOption = int.Parse(Console.ReadLine());
 
-void Menu()
+
+void MenuOptions()
 {
-    switch (selectedOption)
+    Console.WriteLine("Please Select The Options");
+    Console.WriteLine("1. Add User");
+    Console.WriteLine("2. Edit User");
+    Console.WriteLine("3. Delete User");
+    Console.WriteLine("4. Display Specific User");
+    try
     {
-        case 1:
-            AddUser();
-            break;
-        case 2:
-            Console.WriteLine("Please Enter File Name");
-            EditUser(Console.ReadLine());
-            break;
-        case 3:
-            Console.WriteLine("Please Enter File Name");
-            DeleteUser(Console.ReadLine());
-            break;
-        case 4:
-            Console.WriteLine("Please Enter File Name");
-            GetDataFromUserFile(Console.ReadLine());
-            break;
+        int selectedOption = int.Parse(Console.ReadLine());
 
-        default:
-            Menu();
-            break;
+        switch (selectedOption)
+        {
+            case 1:
+                AddUser();
+                break;
+            case 2:
+                Console.WriteLine("Please Enter File Name");
+                EditUser(Console.ReadLine());
+                break;
+            case 3:
+                Console.WriteLine("Please Enter File Name");
+                DeleteUser(Console.ReadLine());
+                break;
+            case 4:
+                Console.WriteLine("Please Enter File Name");
+                GetDataFromUserFile(Console.ReadLine());
+                break;
+
+            default:
+                MenuOptions();
+                break;
+        }
+    }
+    catch (FormatException )
+    {
+        Console.WriteLine("Please Enter A Valid Input");
+        MenuOptions();
+    }
+    catch (Exception err)
+    {
+        Console.WriteLine(err.Message);
     }
 }
 
-Menu();
+MenuOptions();
 
 void CreateUseres()
 {
@@ -101,13 +115,24 @@ void GetDataAndWriteToSeperateFile(List<User> userList)
 
 void GetDataFromUserFile(string fileName)
 {
-    FileStream fileStreamObject = new FileStream($@"C:\test\Users\{fileName}.txt", FileMode.Open);
-    using (StreamReader readFromUserFile = new StreamReader(fileStreamObject))
+    try
     {
-        for (int i = 0; i < readFromUserFile.Peek(); i++)
+        FileStream fileStreamObject = new FileStream($@"C:\test\Users\{fileName}.txt", FileMode.Open);
+        using (StreamReader readFromUserFile = new StreamReader(fileStreamObject))
         {
-            Console.WriteLine(readFromUserFile.ReadLine());
+            for (int i = 0; i < readFromUserFile.Peek(); i++)
+            {
+                Console.WriteLine(readFromUserFile.ReadLine());
+            }
         }
+    }catch(FileNotFoundException)
+    {
+        Console.WriteLine("Please Enter The Correct File Name");
+        GetDataFromUserFile(fileName);
+    }
+    catch (Exception err)
+    {
+        Console.WriteLine(err.Message);
     }
 }
 
@@ -117,8 +142,15 @@ void GetDataFromUserFile(string fileName)
 
 void AddUser()
 {
-   Console.WriteLine("Please Enter firstName,lastName,yearOfBirth,eamil");
-   usersList.Add(new User(Console.ReadLine(), Console.ReadLine(), int.Parse(Console.ReadLine()), Console.ReadLine()));
+    try
+    {
+        Console.WriteLine("Please Enter firstName,lastName,yearOfBirth,eamil");
+        usersList.Add(new User(Console.ReadLine(), Console.ReadLine(), int.Parse(Console.ReadLine()), Console.ReadLine()));
+    }catch (FormatException)
+    {
+        Console.WriteLine("Please Enter A Valid Input");
+        AddUser();
+    }
    foreach (User user in usersList)
    {
        Console.WriteLine($"{user.FirstName} {user.LastName} {user.YearOfBirth} {user.Email}");
@@ -127,30 +159,40 @@ void AddUser()
 
 void DeleteUser(string fileName)
 {
-    File.Delete(fileName);
+    try
+    {
+        File.Delete(fileName);
+    }
+    catch (FileNotFoundException)
+    {
+        Console.WriteLine("Please Enter The Correct File Name");
+    }
 }
+
 
 void EditUser(string userName)
 {
-    string[] arrayOfStrings;
-
-    FileStream fileStreamObject = new FileStream($@"C:\test\Users\{userName}.txt", FileMode.Open);
-    using (StreamReader readFromUserFile = new StreamReader(fileStreamObject))
+    try
     {
-        arrayOfStrings = readFromUserFile.ReadLine().Split(" ");
-    }
+        string[] arrayOfStrings;
 
-    FileStream userFile = new FileStream($@"C:\test\Users\{userName}.txt", FileMode.Create);
-    using (StreamWriter writeToUserFile = new StreamWriter(userFile))
-    {
-        Console.WriteLine("Please Select The Options");
-        Console.WriteLine("1. Edit firstName");
-        Console.WriteLine("2. Edit lastName");
-        Console.WriteLine("3. Edit yearOfBirth");
-        Console.WriteLine("4. Edit email");
-        int selectedOption = int.Parse(Console.ReadLine());
-        switch (selectedOption)
+        FileStream fileStreamObject = new FileStream($@"C:\test\Users\{userName}.txt", FileMode.Open);
+        using (StreamReader readFromUserFile = new StreamReader(fileStreamObject))
         {
+            arrayOfStrings = readFromUserFile.ReadLine().Split(" ");
+        }
+
+        FileStream userFile = new FileStream($@"C:\test\Users\{userName}.txt", FileMode.Create);
+        using (StreamWriter writeToUserFile = new StreamWriter(userFile))
+        {
+          Console.WriteLine("Please Select The Options");
+          Console.WriteLine("1. Edit firstName");
+          Console.WriteLine("2. Edit lastName");
+          Console.WriteLine("3. Edit yearOfBirth");
+          Console.WriteLine("4. Edit email");
+          int selectedOption = int.Parse(Console.ReadLine());
+          switch (selectedOption)
+          {
             case 1:
                 Console.WriteLine("Enter firstName");
                 Update(0, writeToUserFile, arrayOfStrings);
@@ -172,6 +214,15 @@ void EditUser(string userName)
                 break;
         }
     }
+    }
+    catch (FileNotFoundException)
+    {
+        Console.WriteLine("Please Enter The Correct File Name");
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
 }
 
 void Update(int number, StreamWriter writeToFile, string[] array)
@@ -179,19 +230,30 @@ void Update(int number, StreamWriter writeToFile, string[] array)
     switch (number)
     {
         case 0:
-            writeToFile.Write($"{array[0] = Console.ReadLine()} {array[1]} {array[2]} {array[3]}");
+            EditAndSaveTheChanges(array, 0, writeToFile);
             break;
         case 1:
-            writeToFile.Write($"{array[0]} {array[1] = Console.ReadLine()} {array[2]} {array[3]}");
+            EditAndSaveTheChanges(array, 1, writeToFile);
             break;
         case 2:
-            writeToFile.Write($"{array[0]} {array[1]} {array[2] = Console.ReadLine()} {array[3]}");
+            EditAndSaveTheChanges(array, 2, writeToFile);
             break;
         case 3:
-            writeToFile.Write($"{array[0]} {array[1]} {array[2]} {array[3] = Console.ReadLine()}");
+            EditAndSaveTheChanges(array, 3, writeToFile);
             break;
         default:
             Update(number,writeToFile,array);
             break;
+    }
+}
+
+
+void EditAndSaveTheChanges(string[] array,int indexInTheArray,StreamWriter writeToFile)
+{
+    for (int i = 0; i < array.Length; i++)
+    {
+        if (i == indexInTheArray) writeToFile.Write($"{array[indexInTheArray] = Console.ReadLine()} ");
+        else writeToFile.Write($"{array[i]} ");
+
     }
 }
