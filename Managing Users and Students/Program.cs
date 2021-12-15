@@ -191,29 +191,29 @@ void EditUser(string userName)
           Console.WriteLine("3. Edit yearOfBirth");
           Console.WriteLine("4. Edit email");
           int selectedOption = int.Parse(Console.ReadLine());
-          switch (selectedOption)
-          {
-            case 1:
-                Console.WriteLine("Enter firstName");
-                Update(0, writeToUserFile, arrayOfStrings);
-                break;
-            case 2:
-                Console.WriteLine("Enter lastName");
-                Update(1, writeToUserFile, arrayOfStrings);
-                break;
-            case 3:
-                Console.WriteLine("Enter yearOfBirth");
-                Update(2, writeToUserFile, arrayOfStrings);
-                break;
-            case 4:
-                Console.WriteLine("Enter Email");
-                Update(3, writeToUserFile, arrayOfStrings);
-                break;
-            default:
-                EditUser(userName);
-                break;
+            switch (selectedOption)
+            {
+                case 1:
+                    Console.WriteLine("Enter firstName");
+                    Update(0, writeToUserFile, arrayOfStrings);
+                    break;
+                case 2:
+                    Console.WriteLine("Enter lastName");
+                    Update(1, writeToUserFile, arrayOfStrings);
+                    break;
+                case 3:
+                    Console.WriteLine("Enter yearOfBirth");
+                    Update(2, writeToUserFile, arrayOfStrings);
+                    break;
+                case 4:
+                    Console.WriteLine("Enter Email");
+                    Update(3, writeToUserFile, arrayOfStrings);
+                    break;
+                default:
+                    EditUser(userName);
+                    break;
+            }
         }
-    }
     }
     catch (FileNotFoundException)
     {
